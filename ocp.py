@@ -66,6 +66,10 @@ class OptimalControlProblemClassical(OptimalControlProblemAbstract):
     Initialize a constraint model manager and adds constraints to it 
     '''
     constraintModelManager = crocoddyl.ConstraintModelManager(state, actuation.nu)
+    # Joint limits
+    if('jointBox' in self.WHICH_CONSTRAINTS and node_id != 0):
+      jointBoxConstraint = self.create_joint_constraint(state, actuation)   
+      constraintModelManager.addConstraint('jointBox', jointBoxConstraint)
     # State limits
     if('stateBox' in self.WHICH_CONSTRAINTS and node_id != 0):
       stateBoxConstraint = self.create_state_constraint(state, actuation)   

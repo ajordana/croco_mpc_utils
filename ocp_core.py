@@ -460,6 +460,31 @@ class OptimalControlProblemAbstract:
     
 
 
+  def create_joint_constraint(self, state, actuation):
+    '''
+    Create state box constraint model 
+    '''
+    import value_learning
+    # Check attributes 
+    self.check_attribute('stateLowerLimit')
+    self.check_attribute('stateUpperLimit')            
+    # Lower
+    if(self.stateLowerLimit == 'None'):
+      clip_joint_min = -np.array([np.inf]*state.nq)
+    elif(self.stateLowerLimit == 'DEFAULT'):
+      clip_joint_min = state.lb 
+    else:
+      clip_joint_min = np.asarray(self.stateLowerLimit)[:state.nq]
+    # Upper
+    if(self.stateUpperLimit == 'None'):
+      clip_joint_max = np.array([np.inf]*state.ns)
+    elif(self.stateUpperLimit == 'DEFAULT'):
+      clip_joint_max = state.ub 
+    else:
+      clip_joint_max = np.asarray(self.stateUpperLimit)[:state.nq]
+    xBoxCstr = crocoddyl.ConstraintModelResidual(state, value_learning.ResidualModelJointPosition(state), clip_joint_min, clip_joint_max)  
+    return xBoxCstr
+
 
   def create_state_constraint(self, state, actuation):
     '''
